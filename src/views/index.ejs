@@ -1,0 +1,7 @@
+<%- include('./blocks/navbar') %>
+  <% for (const video of videos) { %>
+    <img src="/thumbnail?p=<%= video.replace('.webm', '')%>">
+    <a href="/video?v=<%= video.replace('.webm', '')%>"><%= video.replace('.webm', '')%></a>
+  <% } %>
+  </body>
+</html>

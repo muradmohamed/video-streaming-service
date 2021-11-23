@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = ""
+}
+
+model Channel {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  videos    Video[]
+  history   Video[]
+  liked     Video[]
+  Subscribed  Channel[]
+  Subscribers Channel[]
+}
+
+model Video {
+  id       Int        @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  title    String
+  owner    User       @relation(fields: [userId], references: [id])
+  likes    Int
+  dislikes Int
+  comments Array
+}

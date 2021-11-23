@@ -1,0 +1,17 @@
+node_modules
+# Keep environment variables out of version control
+.env
+config.js
+/prisma/migrations
+/src/utils/logs/*
+!/src/utils/logs/example.log
+
+# DON'T UPLOAD USER CONTENT
+/src/uploads/thumbnails/*
+/src/uploads/temp/*
+/src/uploads/videos/*
+
+# ONLY UPLOAD PLACEHOLDER TEXT
+!/src/uploads/thumbnails/README.txt
+!/src/uploads/temp/index.txt
+!/src/uploads/videos/README.txt
