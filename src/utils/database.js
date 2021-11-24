@@ -7,14 +7,9 @@ const client = new PrismaClient({ errorFormat: 'pretty',
 		{ level: 'error', emit: 'event' },
 	] });
 
-const genRandomId = () => {
-	return Date.now().toString();
-};
-
 module.exports.createChannel = (data) => {
 	return client.channel.create({
 		data: {
-			id: genRandomId(),
 			email: data.email,
 			name: data.name,
 			password: data.password,
@@ -29,7 +24,6 @@ module.exports.findChannel = (data) => {
 module.exports.createVideo = (data) => {
 	return client.video.create({
 		data: {
-			id: genRandomId(),
 			title: data.title,
 			owner: {
 				connect: {
