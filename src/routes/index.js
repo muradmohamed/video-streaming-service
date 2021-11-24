@@ -1,6 +1,6 @@
 const express = require('express'),
 	{ IncomingForm } = require('formidable'),
-	{ GenVideoID } = require('../utils'),
+	{ GenVideoID, ensureAuthenticated } = require('../utils'),
 	fs = require('fs'),
 	{ readdir } = require('fs/promises'),
 	{ spawn } = require('child_process'),
@@ -10,8 +10,21 @@ const express = require('express'),
 router.get('/', async (req, res) => {
 	// render page
 	res.render('index', {
+		user: req.isAuthenticated() ? req.user : null,
 		videos: await readdir(`${process.cwd()}/src/uploads/videos/`).then(dir => dir.filter(name => name.endsWith('.webm'))),
 	});
+});
+
+router.get('/signup', (req, res) => {
+	// Only access page if user isn't signed in
+	if (req.isAuthenticated()) return res.redirect('/');
+	res.render('navbar/signup');
+});
+
+router.get('/login', (req, res) => {
+	// Only access page if user isn't signed in
+	if (req.isAuthenticated()) return res.redirect('/');
+	res.render('navbar/login');
 });
 
 router.get('/thumbnail', (req, res) => {
@@ -22,10 +35,9 @@ router.get('/thumbnail', (req, res) => {
 			.status(404)
 			.render('404-page');
 	}
-
 });
 // Upload page
-router.get('/upload', (req, res) => {
+router.get('/upload', ensureAuthenticated, (req, res) => {
 	res.render('upload');
 });
 

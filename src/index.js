@@ -5,32 +5,33 @@ const express = require('express'),
 	{ port } = require('./config.js'),
 	{ logger } = require('./utils'),
 	http = require('http'),
+	session = require('express-session'),
+	MemoryStore = require('memorystore'),
+	passport = require('passport'),
+	mStore = MemoryStore(session),
+	bodyParser = require('body-parser'),
+	flash = require('connect-flash'),
 	compression = require('compression');
-
-const { PrismaClient } = require('@prisma/client');
-
-const prisma = new PrismaClient();
-
-async function main() {
-	const allUsers = await prisma.user.findMany();
-	console.log(allUsers);
-}
-
-main()
-	.catch((e) => {
-		throw e;
-	})
-	.finally(async () => {
-		await prisma.$disconnect();
-	});
+require('./utils/passport')(passport);
 
 // normal configuration
 app
 	.use(compression())
+	.use(bodyParser.urlencoded({ extended: true }))
+	.use(bodyParser.json())
+	.use(session({
+		store:  new mStore({ checkPeriod: 86400000 }),
+		secret: 'secret',
+		resave: false,
+		saveUninitialized: false,
+	}))
+	.use(passport.initialize())
+	.use(passport.session())
 	.use(function(req, res, next) {
 		if (req.originalUrl !== '/favicon.ico') logger.connection(req, res);
 		next();
 	})
+	.use(flash())
 	.engine('html', require('ejs').renderFile)
 	.set('view engine', 'ejs')
 	.set('views', './src/views')
@@ -38,11 +39,13 @@ app
 	.use(favicon('./src/assets/favicon.ico'))
 	.use('/', require('./routes'))
 	.use('/video', require('./routes/videos'))
-// eslint-disable-next-line no-unused-vars
+	.use('/user', require('./routes/user'))
 	.use(function(error, req, res, next) {
 		logger.log(error.message, 'error');
 		res.status(500);
-		res.render('500-page');
+		res.render('500-page', {
+			title:'500: Internal Server Error', error: error,
+		});
 	})
 	.get('*', function(req, res) {
 		res

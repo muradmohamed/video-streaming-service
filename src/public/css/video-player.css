@@ -3,6 +3,7 @@
   --youtube-red: #FE0900;
 }
 .video-container {
+  float:left;
   max-width: fit-content;
   border-radius: 4px;
   margin: 0 auto;
@@ -12,10 +13,8 @@
   justify-content: center;
 }
 video:not(:fullscreen) {
-  max-width: 800px;
-  min-width: 450px;
-  max-height: 800px;
-  min-height: 400px;
+  width: 1280px;
+  height: 720px;
   border-radius: 4px;
 }
 video:fullscreen {

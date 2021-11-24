@@ -6,6 +6,7 @@ const express = require('express'),
 router.get('/', (req, res) => {
 	if (fs.existsSync(process.cwd() + `/src/uploads/videos/${req.query.v}.webm`)) {
 		res.render('video', {
+			user: req.isAuthenticated() ? req.user : null,
 			ID: req.query.v,
 		});
 	} else {
