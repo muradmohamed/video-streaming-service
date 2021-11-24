@@ -125,6 +125,24 @@ module.exports.subscribe = (data) => {
 	});
 };
 
+module.exports.getCountsForChannel = async (channelId) => {
+	const counts = await client.channel.findUnique({
+		select: {
+			_count: {
+				select:{
+					videos: true,
+					subscribers: true,
+				},
+			},
+		},
+		where: {
+			id: channelId,
+		},
+	});
+
+	return counts._count;
+};
+
 
 module.exports.getChannelWithJoins = (channelId) => {
 	return client.channel.findUnique({
