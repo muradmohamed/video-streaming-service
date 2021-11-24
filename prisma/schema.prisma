@@ -9,7 +9,7 @@ datasource db {
 
 model Channel {
   // Generally, you want an id that doesn't change - assuming that name would change so I added a seperate id field
-  id String @id
+  id String @id @default(cuid())
 
   name     String @unique
   email    String @unique
@@ -34,7 +34,7 @@ model Channel {
 }
 
 model Video {
-  id String @id
+  id String @id @default(cuid())
 
   title String
 
