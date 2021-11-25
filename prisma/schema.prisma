@@ -17,10 +17,11 @@ model Channel {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  videos   Video[]
-  history  VideoView[]
-  ratings  VideoRating[]
-  comments Comment[]
+  videos         Video[]
+  history        VideoView[]
+  ratings        VideoRating[]
+  commentRatings CommentRating[]
+  comments       Comment[]
 
   subscribers Channel[] @relation("Subscriber")
   subscribed  Channel[] @relation("Subscriber")
@@ -97,9 +98,29 @@ model Comment {
   ownerId String  @map("owner_id")
   owner   Channel @relation(references: [id], fields: [ownerId], onDelete: Cascade)
 
+  ratings CommentRating[]
+
   parentCommentId Int?
   parentComment   Comment?  @relation("CommentReply", fields: [parentCommentId], references: [id])
   replies         Comment[] @relation("CommentReply")
 
   @@map("comments")
+}
+
+model CommentRating {
+  type CommentRatingType
+
+  channelId String  @map("channel_id")
+  channel   Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  commentId Int     @map("comment_id")
+  comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@id([channelId, commentId], name: "id")
+  @@map("comment_ratings")
+}
+
+enum CommentRatingType {
+  LIKE
+  DISLIKE
 }
