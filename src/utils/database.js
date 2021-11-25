@@ -121,6 +121,9 @@ module.exports.fetchComments = (data) => {
 				videoId: data.videoID,
 			},
 		},
+		include: {
+			owner:true,
+		},
 	});
 };
 

@@ -7,14 +7,11 @@ module.exports = function(passport) {
 	passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, password, done) => {
 		try {
 			// Check database for that email
-			console.log(email);
 			const user = await findChannel({ email: email });
-			console.log(user);
 			if (!user) return done(null, false, { message:'Email not registered!' });
 
 			// Check if the password is correct
 			bcrypt.compare(password, user.password, (err, isMatch) => {
-				console.log(isMatch);
 				if (err) throw err;
 				if (isMatch) {
 					return done(null, user);
@@ -28,7 +25,7 @@ module.exports = function(passport) {
 	}));
 
 	passport.serializeUser(function(user, done) {
-		done(null, user.id);
+		done(null, user);
 	});
 
 	passport.deserializeUser(function(obj, done) {

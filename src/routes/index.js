@@ -28,6 +28,23 @@ router.get('/login', (req, res) => {
 	res.render('navbar/login');
 });
 
+router.get('/avatar', (req, res) => {
+	res.redirect(`/img/${req.user.name[0]}-icon-min.png`);
+});
+
+router.get('/avatar/:channelName', (req, res) => {
+	res.redirect(`/img/${req.params.channelName[0]}-icon-min.png`);
+});
+
+
+router.get('/channel', (req, res) => {
+	if (req.isAuthenticated()) return res.redirect(`/channel/${req.user}`);
+	res
+		.status(404)
+		.render('404-page');
+});
+
+
 router.get('/channel/:channelID', async (req, res) => {
 	// Get channel that the user is looking at
 	const channel = await findChannel({ id: req.params.channelID });

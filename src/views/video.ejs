@@ -76,7 +76,7 @@
         <%= videoData.views ?? 0 %> views - <%= timeAgo.format(video.uploadedAt) %>
         <span style="float:right;">
           <a type="button" onclick="likeVid()">
-            <% if (likeUser.find(obj => obj.channelId == user)) { %>
+            <% if (likeUser.find(obj => obj.channelId == user.id)) { %>
               <i class="fas fa-thumbs-up"></i> <%= videoData.likes %>
             <% } else { %>
               <i class="far fa-thumbs-up"></i> <%= videoData.likes %>
@@ -95,7 +95,7 @@
       <hr>
       <div class="Owner-Section">
         <div class="media">
-          <img class="mr-3 rounded-circle" width="48" src="https://yt3.ggpht.com/JkZURTALTNveNpQbsq_U8iE9NLz7uyxI44Aj4MckzfnlT2sF5IPlb3Vv-gRMTA1GZOmJktT38g=s68-c-k-c0x00ffffff-no-rj" alt="Generic placeholder image">
+          <img class="mr-3 rounded-circle" width="48" src="/avatar/<%= owner.name%>" alt="Generic placeholder image">
           <div class="media-body">
             <h5 class="mt-0"><%= owner.name %></h5>
               <div class="show-hide-text wrapper">
@@ -116,9 +116,9 @@
         </form>
         <% for (const comment of comments) { %>
           <div class="media">
-            <img class="mr-3" src="..." alt="Icon">
+            <img class="mr-3" src="/avatar/<%= comment.owner.name%>" alt="Icon">
             <div class="media-body">
-              <h5 class="mt-0"><%= comment.ownerId%></h5>
+              <h5 class="mt-0"><%= comment.owner.name%></h5>
               <%= comment.content%>
             </div>
           </div>
