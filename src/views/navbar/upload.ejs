@@ -1,0 +1,153 @@
+<%- include('../blocks/navbar') %>
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+  Launch demo modal
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document" style="width:100%">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">{{TITLE}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container">
+          <div class="row">
+            <div class="col-sm-8">
+              <div class="wrapper">
+                <div class="second-heading">
+                  Title (required) <i class="far fa-question-circle"></i>
+                </div>
+                <textarea id="qual" class="textarea1">{{TITLE}}</textarea>
+              </div>
+              <div class="wrapper">
+                <div class="second-heading">
+                  Description (required) <i class="far fa-question-circle"></i>
+                </div>
+                <textarea id="qual" class="textarea1">{{TITLE}}</textarea>
+              </div>
+              <div class="form-group">
+                <label for="exampleFormControlFile1">Thumbnail</label>
+                <small><br>Select or upload a picture that shows what's in your video. A good thumbnail stands out and draws viewers' attention.</small>
+                <label for="file-upload" class="custom-file-upload">
+                  <i class="fa fa-cloud-upload"></i> Custom Upload
+                </label>
+                <input id="file-upload" type="file"/>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              One of three columns
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-body">
+        <p style="text-align:left;">
+          <small>{{Show processing %}}</small>
+          <span style="float:right;">
+            <button type="button" class="btn btn-primary">Next</button>
+          </span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<form action="/files/upload" method="post" encType="multipart/form-data" ref='uploadForm' id='uploadForm' >
+  <label class="dropdown-item" type="button" id="fileHover">
+    File upload<input type="file" hidden name="sampleFile" id="upload-input">
+  </label>
+</form>
+<progress id="upload" value="32" max="100"> 32% </progress>
+<style media="screen">
+  input[type="file"] {
+    display: none;
+  }
+  .custom-file-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+  .wrapper {
+    position: relative;
+    border: 1px solid #000;
+    overflow: auto;
+    display: inline-block;
+    width: 100%;
+  	padding: 10px;
+  }
+
+  .wrapper .second-heading {
+    width: 100%;
+  	text-align: left;
+    font-size: 12px;
+    font-weight: normal;
+    float: left;
+  }
+
+  .wrapper .textarea1{
+    width: 100%;
+    height: 100px;
+    float: left;
+    display: block;
+    border: none;
+    outline: none;
+  }
+</style>
+<script type="text/javascript">
+  $(document).ready(function($) {
+  	$('#upload-input').on('change', function() {
+  		const files = $(this)[0].files;
+  		console.log('h');
+  		console.log(files);
+  		if (files.length > 0) {
+  			// create a FormData object which will be sent as the data payload in the
+  			const formData = new FormData();
+
+  			// loop through all the selected files and add them to the formData object
+  			for (const file of files) {
+  				// add the files to formData object for the data payload
+  				const name = file.webkitRelativePath.length >= 1 ? file.webkitRelativePath : file.name;
+  				formData.append('uploads[]', file, name);
+  			}
+
+  			// Send data
+  			$.ajax({
+  				url: '/api/upload',
+  				type: 'POST',
+  				data: formData,
+  				processData: false,
+  				contentType: false,
+  				xhr: function() {
+  					// create an XMLHttpRequest
+  					const xhr = new XMLHttpRequest();
+  					// listen to the 'progress' event
+  					xhr.upload.addEventListener('progress', function(evt) {
+  						if (evt.lengthComputable) {
+  							// calculate the percentage of upload completed
+  							let percentComplete = evt.loaded / evt.total;
+  							percentComplete = parseInt(percentComplete * 100);
+  							console.log(percentComplete);
+  							// update the Bootstrap progress bar with the new percentage
+  							$('.upload').text(percentComplete + '%');
+  							$('.upload').width(percentComplete + '%');
+  							// once the upload reaches 100%, set the progress bar text to done
+  							if (percentComplete === 100) {
+                  console.log('complete')
+  								$('.upload').html('Done');
+  							}
+  						}
+  					}, false);
+  					return xhr;
+  				},
+  			});
+  		}
+  	});
+  })
+</script>

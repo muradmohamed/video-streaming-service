@@ -11,6 +11,7 @@
     <meta property="og:description" content="Enjoy the videos and music you love, upload original content, and share it all with friends and family.">
     <meta property="og:image" content="/favicon.ico">
     <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
     <script src="/js/jquery.min.js"></script>
     <script src="/js/popper.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
@@ -18,7 +19,7 @@
     <title>Video streaming service</title>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-light" id="navBar">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top" id="navBar">
       <a class="navbar-brand btn" href="/">Home</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -28,12 +29,22 @@
         </ul>
         <ul class="navbar-nav">
           <% if (user) { %>
-            <li class="navbar-nav">
-              <a href="/upload"><i class="fas fa-video"></i></a>
+            <li class="navbar-nav dropdown">
+              <a class="nav-item nav-link" href="" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span data-toggle="tooltip" data-placement="bottom" title="Create">
+                  <i class="fas fa-video"></i>
+                </span>
+              </a>
+              <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" href="/upload">Upload video</a>
+                <a class="dropdown-item" href="/live">Go live</a>
+              </div>
             </li>
             <li class="navbar-nav dropdown">
-              <a class="nav-item text-dark nav-link" href="" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-bell"></i>
+              <a class="nav-item nav-link" href="" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span data-toggle="tooltip" data-placement="bottom" title="Notifications">
+                  <i class="fas fa-bell"></i>
+                </span>
               </a>
               <div class="dropdown-menu dropdown-menu-right">
                 <h6 class="dropdown-header">Notifications - 0</h6>
@@ -42,10 +53,10 @@
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <img src="/avatar" style="width:32px;" class="rounded-circle" alt="User avatar">
+                <img src="/api/avatar/<%= user.id%>" style="width:32px;" class="rounded-circle" alt="User avatar">
               </a>
               <div class="dropdown-menu dropdown-menu-right">
-                <a class="dropdown-item text-dark" href="/channel/<%= user %>">Your channel</a>
+                <a class="dropdown-item text-dark" href="/channel/<%= user.id %>">Your channel</a>
                 <a class="dropdown-item text-dark" href="/files">My files</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="/user/logout" id="logout">Logout</a>
@@ -66,4 +77,8 @@
       content: none;
     }
     </style>
-    &nbsp;
+    <script>
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
+    </script>

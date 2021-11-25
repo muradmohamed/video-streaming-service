@@ -1,0 +1,101 @@
+<nav id="sidebar">
+  <ul class="list-unstyled components" style="align:center">
+    <li>
+      <a href="/">Home</a>
+    </li>
+    <li>
+      <a href="/feed/explore">Explore</a>
+    </li>
+    <li>
+      <a href="/feed/subscriptions">Subscriptions</a>
+    </li>
+    <hr>
+    <li>
+      <a href="/feed/subscriptions">library</a>
+    </li>
+    <li>
+      <a href="/feed/subscriptions">History</a>
+    </li>
+    <li>
+      <a href="/feed/subscriptions">Watch later</a>
+    </li>
+    <li>
+      <a href="/feed/subscriptions">Liked videos</a>
+    </li>
+    <hr>
+    <li>
+      <h4>Subscription</h4>
+      ...
+    </li>
+    <hr>
+    <li>
+      <h4>Settings</h4>
+    </li>
+    <li>
+      <h4>Report history</h4>
+    </li>
+    <li>
+      <h4>Help</h4>
+    </li>
+    <li>
+      <h4>Send feedback</h4>
+    </li>
+    <li>
+      <h4>Send feedback</h4>
+    </li>
+    <li>
+      <h4>Send feedback</h4>
+    </li>
+    <li>
+      <h4>Send feedback</h4>
+    </li>
+    <li>
+      <h4>Send feedback</h4>
+    </li>
+    <li>
+      <h4>Send feedback</h4>
+    </li>
+    <li>
+      <h4>Send feedback</h4>
+    </li>
+    <li>
+      <h4>Send feedback</h4>
+    </li>
+    <li>
+      <h4>Send feedback</h4>
+    </li>
+    
+  </ul>
+</nav>
+<style>
+  a:hover {
+    text-decoration: none;
+  }
+  .card-text:hover {
+    background-color: none;
+  }
+  .smallFav {
+    display: none;
+  }
+  @media (max-width: 1260px) {
+    .smallFav {
+      display: block
+    }
+  }
+</style>
+<script type="text/javascript">
+  //icon update
+  $('[data-toggle="collapse"]').on('click', function(){
+    console.log('boo')
+    if ($(this).attr('aria-expanded') == 'true') {
+      $(new Array($(this).find('i'))[0][1]).addClass('fa-sort-up').removeClass('fa-sort-down');
+    } else {
+      $(new Array($(this).find('i'))[0][1]).removeClass('fa-sort-up').addClass('fa-sort-down');
+    }
+  });
+
+  //Only show sidebar tooltips on small screens
+  $('.fas').on('show.bs.tooltip', function () {
+    if ($(window).width() >= 1200) return false
+  })
+</script>

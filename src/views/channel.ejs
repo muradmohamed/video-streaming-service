@@ -31,7 +31,34 @@
     </li>
   </ul>
   <div class="tab-content" id="myTabContent">
-    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">.1.</div>
+    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+      <h1>Uploads</h1>
+      <div class="d-flex justify-content-center flex-wrap" style="max-width:92%">
+        <% for (const video of videos) { %>
+        <div style="padding:10px;">
+          <a href="/video?v=<%= video.id%>">
+            <div class="card" style="width: 18rem;border:none;">
+              <img class="card-img-top" src="/api/thumbnail?p=<%= video.id%>" alt="Card image cap">
+              <div class="card-body">
+                <div class="media">
+                  <a href="/channel/<%= video.ownerId%>">
+                    <img class="mr-3 rounded-circle" width="36" src="/api/avatar/<%= video.ownerId%>" style="border: 1px solid black;">
+                  </a>
+                  <div class="media-body">
+                    <h6 class="mt-0 text-truncate" style="max-width:175px"><%= video.title%></h6>
+                    <a href="/channel/<%= video.ownerId%>" data-toggle="tooltip" data-placement="top" title="<%= video.owner.name%>">
+                      <small><%= video.owner.name%><br></small>
+                    </a>
+                    <small><%= video.views%> views - <%=  timeAgo.format(video.uploadedAt)%></small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+        <% } %>
+      </div>
+    </div>
     <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">.2.</div>
     <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">.3.</div>
   </div>
