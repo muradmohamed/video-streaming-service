@@ -92,6 +92,8 @@ model Comment {
 
   content String
 
+  updatedAt DateTime @updatedAt @map("updated_at")
+
   videoId String @map("video_id")
   video   Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
 
