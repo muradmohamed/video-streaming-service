@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
+const { partition } = require('./functions');
 
 const client = new PrismaClient({ errorFormat: 'pretty',
 	log: [
@@ -7,14 +8,9 @@ const client = new PrismaClient({ errorFormat: 'pretty',
 		{ level: 'error', emit: 'event' },
 	] });
 
-const genRandomId = () => {
-	return Date.now().toString();
-};
-
 module.exports.createChannel = (data) => {
 	return client.channel.create({
 		data: {
-			id: genRandomId(),
 			email: data.email,
 			name: data.name,
 			password: data.password,
@@ -29,7 +25,6 @@ module.exports.findChannel = (data) => {
 module.exports.createVideo = (data) => {
 	return client.video.create({
 		data: {
-			id: genRandomId(),
 			title: data.title,
 			owner: {
 				connect: {
@@ -131,6 +126,82 @@ module.exports.subscribe = (data) => {
 	});
 };
 
+module.exports.getVideosForChannel = async (channelId, take) => {
+	const videos = await client.video.findMany({
+		select: {
+			id: true,
+			title: true,
+			type: true,
+			description: true,
+			attributes: true,
+			uploadedAt: true,
+			ratings: true,
+			owner: {
+				select: {
+					id: true,
+					name: true,
+				},
+			},
+			_count: {
+				select: {
+					views: true,
+				},
+			},
+		},
+		where: {
+			ownerId: channelId,
+		},
+		take,
+	});
+
+	const mapper = (video) => {
+		const [likes, dislikes] = partition(video.ratings, (rating) => rating.type === 'LIKE');
+
+		return {
+			id: video.id,
+			title: video.title,
+			type: video.type,
+			description: video.description,
+			attributes: video.attributes.split(','),
+			uploadedAt: video.uploadedAt,
+			owner: video.owner,
+			...video._count,
+			likes: likes.length,
+			dislikes: dislikes.length,
+		};
+	};
+
+
+	return videos.map(mapper);
+};
+
+
+module.exports.getCountsForVideo = async (videoId) => {
+	const video = await client.video.findUnique({
+		select: {
+			ratings: {
+				select: {
+					type: true,
+				},
+			},
+			_count: {
+				select: {
+					comments: true,
+					views: true,
+				},
+			},
+		},
+		where: {
+			id: videoId,
+		},
+	});
+
+	if (!video) return null;
+
+	const [likes, dislikes] = partition(video.ratings, (rating) => rating.type === 'LIKE');
+
+	return { ...video._count, likes: likes.length, dislikes: dislikes.length };
+};
 
 module.exports.getChannelWithJoins = (channelId) => {
 	return client.channel.findUnique({
