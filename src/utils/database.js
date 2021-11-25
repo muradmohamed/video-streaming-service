@@ -114,15 +114,57 @@ module.exports.createComment = (data) => {
 	});
 };
 
-module.exports.fetchComments = (data) => {
-	return client.comment.findMany({
+module.exports.fetchComment = (commentId) => {
+	return client.comment.findUnique({
 		where: {
-			id: {
-				videoId: data.videoID,
+			id: commentId,
+		},
+	});
+};
+
+module.exports.fetchCommentReplies = (commentId) => {
+	return this.fetchComment(commentId).replies();
+};
+
+module.exports.replyToComment = async (data) => {
+	const comment = await this.fetchComment(data.commentId);
+	if (!comment) return null;
+
+	return client.comment.create({
+		data: {
+			content: data.content,
+			parentComment: {
+				connect: {
+					id: comment.id,
+				},
+			},
+			video: {
+				connect: {
+					id: comment.videoId,
+				},
+			},
+			owner: {
+				connect :{
+					id: data.channelId,
+				},
 			},
 		},
+	});
+};
+
+module.exports.fetchComments = (data) => {
+	return client.comment.findMany({
 		include: {
-			owner:true,
+			owner: true,
+			_count: {
+				select: {
+					replies: true,
+				},
+			},
+		},
+		where: {
+			videoId: data.videoID,
+			parentCommentId: null,
 		},
 	});
 };
