@@ -1,7 +1,7 @@
 const express = require('express'),
 	{ IncomingForm } = require('formidable'),
 	{ GenVideoID, ensureAuthenticated } = require('../utils'),
-	{ findChannel, createVideo } = require('../utils/database'),
+	{ findChannel, createVideo, getVideosForChannel } = require('../utils/database'),
 	fs = require('fs'),
 	{ readdir } = require('fs/promises'),
 	{ spawn } = require('child_process'),
@@ -31,10 +31,9 @@ router.get('/login', (req, res) => {
 router.get('/channel/:channelID', async (req, res) => {
 	// Get channel that the user is looking at
 	const channel = await findChannel({ id: req.params.channelID });
-
 	res.render('channel', {
 		user: req.isAuthenticated() ? req.user : null,
-		channel: channel,
+		channel,
 	});
 });
 

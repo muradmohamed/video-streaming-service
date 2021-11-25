@@ -99,9 +99,27 @@ module.exports.dislikeVideo = (data) => {
 module.exports.createComment = (data) => {
 	return client.comment.create({
 		data: {
-			videoId: data.videoId,
 			content: data.content,
-			ownerId: data.channelId,
+			video: {
+				connect: {
+					id: data.videoId,
+				},
+			},
+			owner: {
+				connect: {
+					id: data.channelId,
+				},
+			},
+		},
+	});
+};
+
+module.exports.fetchComments = (data) => {
+	return client.comment.findMany({
+		where: {
+			id: {
+				videoId: data.videoID,
+			},
 		},
 	});
 };

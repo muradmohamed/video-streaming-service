@@ -108,6 +108,22 @@
           </div>
         </div>
       </div>
+      <div class="comments">
+        <h6><%= videoData.comments%> comments</h6>
+        <form class="form-inline" action="/video/comment/<%= video.id%>" method="POST">
+          <input type="text" class="form-control" id="inputPassword2" placeholder="Add a public comment" name="content">
+          <button type="submit" class="btn btn-primary mb-2">Comment</button>
+        </form>
+        <% for (const comment of comments) { %>
+          <div class="media">
+            <img class="mr-3" src="..." alt="Icon">
+            <div class="media-body">
+              <h5 class="mt-0"><%= comment.ownerId%></h5>
+              <%= comment.content%>
+            </div>
+          </div>
+        <% } %>
+      </div>
     </div>
     <div class="col-sm-4" style="padding-left:70px;">
       <% for (let count = 0; count < 20; count++) { %>

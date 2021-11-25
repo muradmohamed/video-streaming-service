@@ -1,7 +1,7 @@
 const express = require('express'),
 	router = express.Router(),
 	{ ensureAuthenticated } = require('../utils'),
-	{ getVideo, findChannel, likeVideo, getCountsForVideo, getLikesForVideo, dislikeVideo, viewVideo } = require('../utils/database'),
+	{ getVideo, findChannel, likeVideo, getCountsForVideo, getLikesForVideo, dislikeVideo, viewVideo, createComment, fetchComments } = require('../utils/database'),
 	en = require('javascript-time-ago/locale/en.json'),
 	TimeAgo = require('javascript-time-ago'),
 	fs = require('fs');
@@ -11,15 +11,18 @@ TimeAgo.addDefaultLocale(en);
 const timeAgo = new TimeAgo('en-US');
 router.get('/', async (req, res) => {
 	if (fs.existsSync(process.cwd() + `/src/uploads/videos/${req.query.v}.webm`)) {
-		const video = await getVideo({ id: req.query.v });
-		const owner = await findChannel({ id: video.ownerId });
-		const videoData = await getCountsForVideo(req.query.v);
-		const likeUser = await getLikesForVideo(req.query.v);
-		console.log(likeUser);
+		// Fetch all data from database
+		const video = await getVideo({ id: req.query.v }),
+			owner = await findChannel({ id: video.ownerId }),
+			videoData = await getCountsForVideo(req.query.v),
+			comments = await fetchComments(req.query.v),
+			likeUser = await getLikesForVideo(req.query.v);
+		console.log(comments);
+		// Display page
 		res.render('video', {
 			user: req.isAuthenticated() ? req.user : null,
 			ID: req.query.v,
-			video, owner, videoData, likeUser,
+			video, owner, videoData, likeUser, comments,
 			timeAgo,
 		});
 	} else {
@@ -71,6 +74,25 @@ router.post('/view/:videoID', ensureAuthenticated, async (req, res) => {
 	}
 });
 
+router.post('/comment/:videoID', ensureAuthenticated, async (req, res) => {
+	const { content } = req.body;
+	console.log({
+		videoId: req.params.videoID,
+		content: content,
+		channelId: req.user,
+	});
+	try {
+		await createComment({
+			videoId: req.params.videoID,
+			content: content,
+			channelId: req.user,
+		});
+		res.json({ success: 'Success' });
+	} catch (e) {
+		console.log(e);
+		res.json({ error: 'error' });
+	}
+});
 // streaming route
 router.get('/data/:id', (req, res) => {
 	const videoPath = process.cwd() + `/src/uploads/videos/${req.params.id}.webm`,
