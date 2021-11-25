@@ -19,13 +19,22 @@ module.exports.createChannel = (data) => {
 };
 
 module.exports.findChannel = (data) => {
-	return client.channel.findUnique({ where: { email: data.email } });
+	if (data.email) {
+		return client.channel.findUnique({ where: { email: data.email } });
+	} else if (data.id) {
+		return client.channel.findUnique({ where: { id: data.id } });
+	} else {
+		return null;
+	}
 };
 
 module.exports.createVideo = (data) => {
 	return client.video.create({
 		data: {
+			id: data.id,
 			title: data.title,
+			type: data.type,
+			attributes: data.attributes,
 			owner: {
 				connect: {
 					id: data.channelId,
@@ -43,6 +52,10 @@ module.exports.viewVideo = (data) => {
 			channelId: data.channelId,
 		},
 	});
+};
+
+module.exports.getVideo = (data) => {
+	return client.video.findUnique({ where: { id: data.id } });
 };
 
 module.exports.likeVideo = (data) => {

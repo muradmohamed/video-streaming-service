@@ -12,7 +12,7 @@
  [![Discord](https://img.shields.io/discord/658113349384667198.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/8g6zUQu)
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=Spiderjockey02_video-streaming-service&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=Spiderjockey02_video-streaming-service)
 [![CodeFactor](https://www.codefactor.io/repository/github/spiderjockey02/video-streaming-service/badge)](https://www.codefactor.io/repository/github/spiderjockey02/video-streaming-service)
-  
+
 </div>
 
 <p align="center">
@@ -29,7 +29,7 @@
 
 ## ❓ About
 
-An open source video streaming service like youtube or vimeo. 
+An open source video streaming service like youtube or vimeo.
 
 If you liked this repository, feel free to leave a star ⭐ to help promote it!
 
@@ -59,8 +59,8 @@ Things to do for this to be near complete:
 - [ ] Allow live-streaming
   - [ ] Donation system
 
+## 📜 Credits
+  * **[T3NED#0001](https://github.com/T3NED)** - Database setup + prisma
 
 ## 📖 License
-
 Released under the [Apache License 2.0](https://github.com/Spiderjockey02/video-streaming-service/blob/master/docs/LICENSE) license.
-

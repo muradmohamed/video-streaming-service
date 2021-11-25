@@ -70,19 +70,24 @@
           </div>
         </div>
       </div>
-      <h4>New Lethal Tempo - 1.5 second Q cooldown Lvl 1 with Yone</h4>
+      &nbsp;
+      <h4><%= video.title %></h4>
       <p style="text-align:left;">
-        505,447 views - Nov 14, 2021
+        <%= videoData.views ?? 0 %> views - <%= timeAgo.format(video.uploadedAt) %>
         <span style="float:right;">
-          <a type="button">
-            <i class="far fa-thumbs-up"></i> 305K
+          <a type="button" onclick="likeVid()">
+            <% if (likeUser.find(obj => obj.channelId == user)) { %>
+              <i class="fas fa-thumbs-up"></i> <%= videoData.likes %>
+            <% } else { %>
+              <i class="far fa-thumbs-up"></i> <%= videoData.likes %>
+            <% } %>
           </a>
           &nbsp;
-          <a type="button">
-          <i class="far fa-thumbs-down"></i> 1.1M
-        </a>
+          <a type="button" onclick="dislikeVid()">
+            <i class="far fa-thumbs-down"></i> <%= videoData.dislikes %>
+          </a>
         <div class="progress" style="width:125px;float:right;height:2px;">
-          <div class="progress-bar" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+          <div class="progress-bar" role="progressbar" style="width: <%= videoData.likes / (videoData.likes + videoData.dislikes)*100 %>%" aria-valuenow="<%= videoData.likes / (videoData.likes + videoData.dislikes)*100  %>" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
         </span>
       </p>
@@ -92,12 +97,12 @@
         <div class="media">
           <img class="mr-3 rounded-circle" width="48" src="https://yt3.ggpht.com/JkZURTALTNveNpQbsq_U8iE9NLz7uyxI44Aj4MckzfnlT2sF5IPlb3Vv-gRMTA1GZOmJktT38g=s68-c-k-c0x00ffffff-no-rj" alt="Generic placeholder image">
           <div class="media-body">
-            <h5 class="mt-0">Hunefer</h5>
+            <h5 class="mt-0"><%= owner.name %></h5>
               <div class="show-hide-text wrapper">
                 <a id="show-more" class="show-less" href="#show-less">Show less</a>
                 <a id="show-less" class="show-more" href="#show-more">Show more</a>
                 <p>
-                  Lorem Ipsum is simply dummy text of  the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                  <%= video.description ?? ''%>
                 </p>
               </div>
           </div>
@@ -155,6 +160,46 @@
 <script type="text/javascript" src="/js/video-player.js"></script>
 </body>
 </html>
+<script type="text/javascript">
+  function likeVid() {
+    $.ajax({
+  		url: `video/like/${window.location.search.replace('?v=', '')}`,
+  		type: 'POST',
+  		data: JSON.stringify({ 'data': 'some more data' }),
+  		dataType: 'json',
+  		contentType: 'application/json',
+  		complete: function(data) {
+        console.log(data)
+  		},
+  	});
+  }
+
+  function dislikeVid() {
+    $.ajax({
+  		url: `video/dislike/${window.location.search.replace('?v=', '')}`,
+  		type: 'POST',
+  		data: JSON.stringify({ 'data': 'some more data' }),
+  		dataType: 'json',
+  		contentType: 'application/json',
+  		complete: function(data) {
+        console.log(data)
+  		},
+  	});
+  }
+
+  window.addEventListener('DOMContentLoaded', (event) => {
+    $.ajax({
+      url: `video/view/${window.location.search.replace('?v=', '')}`,
+      type: 'POST',
+      data: JSON.stringify({ 'data': 'some more data' }),
+      dataType: 'json',
+      contentType: 'application/json',
+      complete: function(data) {
+        console.log(data)
+      },
+    });
+  });
+</script>
 <style>
 .show-hide-text {
   display: flex;

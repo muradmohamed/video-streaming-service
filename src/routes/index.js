@@ -1,6 +1,7 @@
 const express = require('express'),
 	{ IncomingForm } = require('formidable'),
 	{ GenVideoID, ensureAuthenticated } = require('../utils'),
+	{ findChannel, createVideo } = require('../utils/database'),
 	fs = require('fs'),
 	{ readdir } = require('fs/promises'),
 	{ spawn } = require('child_process'),
@@ -27,6 +28,16 @@ router.get('/login', (req, res) => {
 	res.render('navbar/login');
 });
 
+router.get('/channel/:channelID', async (req, res) => {
+	// Get channel that the user is looking at
+	const channel = await findChannel({ id: req.params.channelID });
+
+	res.render('channel', {
+		user: req.isAuthenticated() ? req.user : null,
+		channel: channel,
+	});
+});
+
 router.get('/thumbnail', (req, res) => {
 	if (fs.existsSync(`${process.cwd()}/src/uploads/thumbnails/${req.query.p}.png`)) {
 		res.sendFile(`${process.cwd()}/src/uploads/thumbnails/${req.query.p}.png`);
@@ -38,7 +49,9 @@ router.get('/thumbnail', (req, res) => {
 });
 // Upload page
 router.get('/upload', ensureAuthenticated, (req, res) => {
-	res.render('upload');
+	res.render('upload', {
+		user: req.user,
+	});
 });
 
 
@@ -61,35 +74,45 @@ router.post('/upload', async (req, res) => {
 				.json({ error: 'Not a video' });
 		}
 
-		const videoID = GenVideoID();
+		try {
+			const videoID = GenVideoID();
+			await createVideo({
+				id: videoID,
+				title: file.originalFilename,
+				channelId: req.user,
+				type: 'PUBLIC',
+				attributes: '',
+			});
+			const args = [
+				'-i', file._writeStream.path,
+				'-c:v', 'libvpx',
+				'-crf', '10',
+				'-b:v', '1M',
+				'-c:a', 'libvorbis',
+				'-cpu-used', '-5',
+				'-deadline', 'realtime',
+				`${process.cwd()}/src/uploads/videos/${videoID}.webm`,
+			];
 
-		const args = [
-			'-i', file._writeStream.path,
-			'-c:v', 'libvpx',
-			'-crf', '10',
-			'-b:v', '1M',
-			'-c:a', 'libvorbis',
-			'-cpu-used', '-5',
-			'-deadline', 'realtime',
-			`${process.cwd()}/src/uploads/videos/${videoID}.webm`,
-		];
+			const proc = spawn('ffmpeg', args);
 
-		const proc = spawn('ffmpeg', args);
+			proc.stdout.on('data', function(data) {
+				console.log(data);
+			});
 
-		proc.stdout.on('data', function(data) {
-			console.log(data);
-		});
+			proc.stderr.setEncoding('utf8');
+			proc.stderr.on('data', function(data) {
+				console.log(data);
+			});
 
-		proc.stderr.setEncoding('utf8');
-		proc.stderr.on('data', function(data) {
-			console.log(data);
-		});
-
-		proc.on('close', function() {
-			console.log('finished');
-			// create thumbnail
-			spawn('ffmpeg', ['-i', `${process.cwd()}/src/uploads/videos/${videoID}.webm`, '-ss', '00:00:01.000', '-vframes', '1', `${process.cwd()}/src/uploads/thumbnails/${videoID}.png`]);
-		});
+			proc.on('close', function() {
+				console.log('finished');
+				// create thumbnail
+				spawn('ffmpeg', ['-i', `${process.cwd()}/src/uploads/videos/${videoID}.webm`, '-ss', '00:00:01.000', '-vframes', '1', `${process.cwd()}/src/uploads/thumbnails/${videoID}.png`]);
+			});
+		} catch (e) {
+			console.log(e);
+		}
 	});
 
 	// log any errors that occur

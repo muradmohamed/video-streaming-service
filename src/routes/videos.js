@@ -1,18 +1,73 @@
 const express = require('express'),
 	router = express.Router(),
+	{ ensureAuthenticated } = require('../utils'),
+	{ getVideo, findChannel, likeVideo, getCountsForVideo, getLikesForVideo, dislikeVideo, viewVideo } = require('../utils/database'),
+	en = require('javascript-time-ago/locale/en.json'),
+	TimeAgo = require('javascript-time-ago'),
 	fs = require('fs');
 
 // get list of video
-router.get('/', (req, res) => {
+TimeAgo.addDefaultLocale(en);
+const timeAgo = new TimeAgo('en-US');
+router.get('/', async (req, res) => {
 	if (fs.existsSync(process.cwd() + `/src/uploads/videos/${req.query.v}.webm`)) {
+		const video = await getVideo({ id: req.query.v });
+		const owner = await findChannel({ id: video.ownerId });
+		const videoData = await getCountsForVideo(req.query.v);
+		const likeUser = await getLikesForVideo(req.query.v);
+		console.log(likeUser);
 		res.render('video', {
 			user: req.isAuthenticated() ? req.user : null,
 			ID: req.query.v,
+			video, owner, videoData, likeUser,
+			timeAgo,
 		});
 	} else {
 		res
 			.status(404)
 			.render('404-page');
+	}
+});
+
+router.post('/like/:videoID', ensureAuthenticated, async (req, res) => {
+	try {
+		const video = await getVideo({ id: req.params.videoID });
+		await likeVideo({
+			videoId: req.params.videoID,
+			channelId: video.ownerId,
+		});
+		res.json({ success: 'Success' });
+	} catch (e) {
+		console.log(e);
+		res.json({ error: 'error' });
+	}
+});
+
+router.post('/dislike/:videoID', ensureAuthenticated, async (req, res) => {
+	try {
+		const video = await getVideo({ id: req.params.videoID });
+		await dislikeVideo({
+			videoId: req.params.videoID,
+			channelId: video.ownerId,
+		});
+		res.json({ success: 'Success' });
+	} catch (e) {
+		console.log(e);
+		res.json({ error: 'error' });
+	}
+});
+
+router.post('/view/:videoID', ensureAuthenticated, async (req, res) => {
+	try {
+		const video = await getVideo({ id: req.params.videoID });
+		await viewVideo({
+			videoId: req.params.videoID,
+			channelId: video.ownerId,
+		});
+		res.json({ success: 'Success' });
+	} catch (e) {
+		console.log(e);
+		res.json({ error: 'error' });
 	}
 });
 
