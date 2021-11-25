@@ -8,28 +8,23 @@ datasource db {
 }
 
 model Channel {
-  // Generally, you want an id that doesn't change - assuming that name would change so I added a seperate id field
   id String @id @default(cuid())
 
   name     String @unique
   email    String @unique
   password String
 
-  // Added the map attributes which maps the field name to the db field name (mysql has a slug case convention for field names)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  videos   Video[] // One-to-Many relationship (videos the channel has uploaded)
-  history  VideoView[] // Many-to-Many relationship (videos the channel has viewed)
-  ratings  VideoRating[] // Many-to-Many relationship (likes and dislikes the channel has submitted)
+  videos   Video[]
+  history  VideoView[]
+  ratings  VideoRating[]
   comments Comment[]
 
-  // Self Many-to-Many relationship (implicit)
-  // https://www.prisma.io/docs/concepts/components/prisma-schema/relations/self-relations#many-to-many-self-relations
   subscribers Channel[] @relation("Subscriber")
   subscribed  Channel[] @relation("Subscriber")
 
-  // Added the map attribute to the table (mysql has a slug case convention for table names)
   @@map("channels")
 }
 
@@ -42,12 +37,12 @@ model Video {
   title       String
   description String?
 
-  views    VideoView[] // Many-to-Many relationship (the channels that have viewed this video)
-  ratings  VideoRating[] // Many-to-Many relationship (the channels that have liked or disliked this video)
-  comments Comment[] // One-to-Many relationship (the comments on this video)
+  views    VideoView[]
+  ratings  VideoRating[]
+  comments Comment[]
 
   ownerId String  @map("owner_id")
-  owner   Channel @relation(references: [id], fields: [ownerId]) // One-to-Many relationship (the owner of the video)
+  owner   Channel @relation(references: [id], fields: [ownerId])
 
   uploadedAt DateTime @default(now()) @map("uploaded_at")
 
@@ -60,16 +55,7 @@ enum VideoType {
   HIDDEN
 }
 
-// Not actually used in any tables
-// enum VideoAttribute {
-//   COMMENTS_DISABLED
-//   RATINGS_DISABLED
-// }
-
-// This table is a Many-to-Many (explicit) relationship middleman
-// https://www.prisma.io/docs/concepts/components/prisma-schema/relations/many-to-many-relations#explicit-many-to-many-relations
 model VideoRating {
-  // LIKE or DISLIKE
   type VideoRatingType
 
   channelId String  @map("channel_id")
@@ -78,9 +64,6 @@ model VideoRating {
   videoId String @map("video_id")
   video   Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
 
-  // multi-field id
-  // Channels should only be able to give 1 rating per video
-  // This will bind the channel with the video (to create a rating)
   @@id([channelId, videoId], name: "id")
   @@map("video_ratings")
 }
@@ -99,9 +82,6 @@ model VideoView {
   videoId String @map("video_id")
   video   Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
 
-  // multi-field id
-  // Channels can view the same video more than once
-  // This will bind the channel with the video and generate an id to create a unique video view for a channel
   @@id([id, channelId, videoId])
   @@map("video_views")
 }
