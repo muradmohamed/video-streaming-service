@@ -36,19 +36,35 @@ model Channel {
 model Video {
   id String @id @default(cuid())
 
+  type VideoType
+  attributes String
+
   title String
+  description String?
 
   views    VideoView[] // Many-to-Many relationship (the channels that have viewed this video)
   ratings  VideoRating[] // Many-to-Many relationship (the channels that have liked or disliked this video)
   comments Comment[] // One-to-Many relationship (the comments on this video)
 
   ownerId String  @map("owner_id")
-  owner   Channel @relation(references: [id], fields: [ownerId], onDelete: Cascade) // One-to-Many relationship (the owner of the video)
+  owner   Channel @relation(references: [id], fields: [ownerId]) // One-to-Many relationship (the owner of the video)
 
   uploadedAt DateTime @default(now()) @map("uploaded_at")
 
   @@map("videos")
 }
+
+enum VideoType {
+  PUBLIC
+  UNLISTED
+  HIDDEN
+}
+
+// Not actually used in any tables
+// enum VideoAttribute {
+//   COMMENTS_DISABLED
+//   RATINGS_DISABLED
+// } 
 
 // This table is a Many-to-Many (explicit) relationship middleman
 // https://www.prisma.io/docs/concepts/components/prisma-schema/relations/many-to-many-relations#explicit-many-to-many-relations
