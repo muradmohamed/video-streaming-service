@@ -37,3 +37,18 @@ module.exports.checkDev = (req, res, next) => {
 			.redirect('/login');
 	}
 };
+
+module.exports.partition = (array, predicate) => {
+	const partitionOne = [];
+	const partitionTwo = [];
+
+	for (let i = 0; i < array.length; i++) {
+		if (predicate(array[i], i)) {
+			partitionOne.push(array[i]);
+		} else {
+			partitionTwo.push(array[i]);
+		}
+	}
+
+	return [partitionOne, partitionTwo];
+};
