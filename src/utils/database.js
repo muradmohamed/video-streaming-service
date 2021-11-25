@@ -49,7 +49,7 @@ module.exports.viewVideo = (data) => {
 	return client.videoView.create({
 		data: {
 			videoId: data.videoId,
-			channelId: data.channelId,
+			channelId: data.channelId ?? undefined,
 		},
 	});
 };
