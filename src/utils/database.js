@@ -1,5 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
-const { partition } = require('./functions');
+const { partition, commentMapper } = require('./functions');
 
 const client = new PrismaClient({ errorFormat: 'pretty',
 	log: [
@@ -49,7 +49,7 @@ module.exports.viewVideo = (data) => {
 	return client.videoView.create({
 		data: {
 			videoId: data.videoId,
-			channelId: data.channelId,
+			channelId: data.channelId ?? undefined,
 		},
 	});
 };
@@ -141,13 +141,130 @@ module.exports.createComment = (data) => {
 	});
 };
 
-module.exports.fetchComments = (data) => {
-	return client.comment.findMany({
-		where: {
-			videoId: data.videoID,
-		},
+module.exports.fetchComment = async (commentId) => {
+	const comment = await client.comment.findUnique({
 		include: {
 			owner: true,
+			ratings: true,
+			_count: {
+				select: {
+					replies: true,
+				},
+			},
+		},
+		where: {
+			id: commentId,
+		},
+	});
+
+	return commentMapper(comment);
+};
+
+module.exports.fetchCommentReplies = async (commentId) => {
+	const comment = await client.comment.findUnique({
+		select: {
+			replies: {
+				include: {
+					owner: true,
+					ratings: true,
+					_count: {
+						select: {
+							replies: true,
+						},
+					},
+				},
+			},
+		},
+		where: {
+			id: commentId,
+		},
+	});
+
+	return comment.replies.map(commentMapper);
+};
+
+module.exports.replyToComment = async (data) => {
+	const comment = await this.fetchComment(data.commentId);
+	if (!comment) return null;
+
+	return client.comment.create({
+		data: {
+			content: data.content,
+			parentComment: {
+				connect: {
+					id: comment.id,
+				},
+			},
+			video: {
+				connect: {
+					id: comment.videoId,
+				},
+			},
+			owner: {
+				connect :{
+					id: data.channelId,
+				},
+			},
+			videoId: data.videoID,
+		},
+	});
+};
+
+module.exports.fetchComments = async (data) => {
+	const comments = await client.comment.findMany({
+		include: {
+			owner: true,
+			ratings: true,
+			_count: {
+				select: {
+					replies: true,
+				},
+			},
+		},
+		where: {
+			videoId: data.videoID,
+			parentCommentId: null,
+		},
+	});
+
+	return comments.map(commentMapper);
+};
+
+module.exports.likeComment = (data) => {
+	return client.commentRating.upsert({
+		where: {
+			id: {
+				channelId: data.channelId,
+				commentId: data.commentId,
+			},
+		},
+		create: {
+			type: 'LIKE',
+			commentId: data.commentId,
+			channelId: data.channelId,
+		},
+		update: {
+			type: 'LIKE',
+		},
+	});
+};
+
+
+module.exports.dislikeComment = (data) => {
+	return client.commentRating.upsert({
+		where: {
+			id: {
+				channelId: data.channelId,
+				commentId: data.commentId,
+			},
+		},
+		create: {
+			type: 'DISLIKE',
+			commentId: data.commentId,
+			channelId: data.channelId,
+		},
+		update: {
+			type: 'DISLIKE',
 		},
 	});
 };

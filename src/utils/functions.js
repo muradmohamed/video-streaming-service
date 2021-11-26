@@ -52,3 +52,20 @@ module.exports.partition = (array, predicate) => {
 
 	return [partitionOne, partitionTwo];
 };
+
+module.exports.commentMapper = (comment) => {
+	const [likes, dislikes] = this.partition(comment.ratings, (c) => c.type === 'LIKE');
+	const replies = comment._count.replies;
+
+	Reflect.deleteProperty(comment, 'ratings');
+	Reflect.deleteProperty(comment, '_count');
+
+	return {
+		...comment,
+		replies,
+		likes:
+		likes.length,
+		dislikes:
+		dislikes.length,
+	};
+};
