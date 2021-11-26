@@ -1,28 +1,23 @@
 const express = require('express'),
 	router = express.Router(),
 	{ ensureAuthenticated } = require('../utils'),
-	{ getVideo, findChannel, likeVideo, getCountsForVideo, getLikesForVideo, dislikeVideo, viewVideo, createComment, fetchComments } = require('../utils/database'),
-	en = require('javascript-time-ago/locale/en.json'),
+	{ getVideo, likeVideo, dislikeVideo, viewVideo, createComment, fetchComments } = require('../utils/database'),
 	TimeAgo = require('javascript-time-ago'),
 	fs = require('fs');
 
 // get list of video
-TimeAgo.addDefaultLocale(en);
 const timeAgo = new TimeAgo('en-US');
 router.get('/', async (req, res) => {
 	if (fs.existsSync(process.cwd() + `/src/uploads/videos/${req.query.v}.webm`)) {
 		// Fetch all data from database
 		const video = await getVideo({ id: req.query.v }),
-			owner = await findChannel({ id: video.ownerId }),
-			videoData = await getCountsForVideo(req.query.v),
-			comments = await fetchComments(req.query.v),
-			likeUser = await getLikesForVideo(req.query.v);
-		console.log(comments);
+			comments = await fetchComments({ videoID: req.query.v });
+
 		// Display page
 		res.render('video', {
 			user: req.isAuthenticated() ? req.user : null,
 			ID: req.query.v,
-			video, owner, videoData, likeUser, comments,
+			video, comments,
 			timeAgo,
 		});
 	} else {
@@ -76,16 +71,11 @@ router.post('/view/:videoID', ensureAuthenticated, async (req, res) => {
 
 router.post('/comment/:videoID', ensureAuthenticated, async (req, res) => {
 	const { content } = req.body;
-	console.log({
-		videoId: req.params.videoID,
-		content: content,
-		channelId: req.user,
-	});
 	try {
 		await createComment({
 			videoId: req.params.videoID,
 			content: content,
-			channelId: req.user,
+			channelId: req.user.id,
 		});
 		res.json({ success: 'Success' });
 	} catch (e) {

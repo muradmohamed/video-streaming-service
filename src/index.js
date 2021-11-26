@@ -40,17 +40,21 @@ app
 	.use('/', require('./routes'))
 	.use('/video', require('./routes/videos'))
 	.use('/user', require('./routes/user'))
+	.use('/api', require('./routes/api'))
+	.use('/channel', require('./routes/channel'))
 	.use(function(error, req, res, next) {
 		logger.log(error.message, 'error');
 		res.status(500);
-		res.render('500-page', {
+		res.render('error-pages/500', {
 			title:'500: Internal Server Error', error: error,
 		});
 	})
 	.get('*', function(req, res) {
 		res
 			.status(404)
-			.render('404-page');
+			.render('error-pages/404', {
+				user: req.isAuthenticated() ? req.user : null,
+			});
 	});
 
 // Create an HTTP service.

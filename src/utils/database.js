@@ -54,8 +54,35 @@ module.exports.viewVideo = (data) => {
 	});
 };
 
-module.exports.getVideo = (data) => {
-	return client.video.findUnique({ where: { id: data.id } });
+module.exports.fetchVideos = () => {
+	return client.video.findMany({
+		include: {
+			owner: true,
+			_count: {
+				select: {
+					views: true,
+				},
+			},
+		},
+	});
+};
+
+module.exports.getVideo = async (data) => {
+	const video = await client.video.findUnique({
+		where: { id: data.id },
+		include: {
+			ratings: true,
+			owner: true,
+			_count: {
+				select: {
+					views: true,
+				},
+			},
+		},
+	});
+
+	const [likes, dislikes] = partition(video.ratings, (rating) => rating.type === 'LIKE');
+	return Object.assign(video, { likes, dislikes });
 };
 
 module.exports.likeVideo = (data) => {
@@ -178,6 +205,7 @@ module.exports.replyToComment = async (data) => {
 					id: data.channelId,
 				},
 			},
+			videoId: data.videoID,
 		},
 	});
 };

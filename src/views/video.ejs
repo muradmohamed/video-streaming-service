@@ -73,21 +73,25 @@
       &nbsp;
       <h4><%= video.title %></h4>
       <p style="text-align:left;">
-        <%= videoData.views ?? 0 %> views - <%= timeAgo.format(video.uploadedAt) %>
+        <%= video._count.views ?? 0 %> views - <%= timeAgo.format(video.uploadedAt) %>
         <span style="float:right;">
           <a type="button" onclick="likeVid()">
-            <% if (likeUser.find(obj => obj.channelId == user.id)) { %>
-              <i class="fas fa-thumbs-up"></i> <%= videoData.likes %>
+            <% if (video.likes.find(obj => obj.channelId == user?.id)) { %>
+              <i class="fas fa-thumbs-up"></i> <%= video.likes.length %>
             <% } else { %>
-              <i class="far fa-thumbs-up"></i> <%= videoData.likes %>
+              <i class="far fa-thumbs-up"></i> <%= video.likes.length %>
             <% } %>
           </a>
           &nbsp;
           <a type="button" onclick="dislikeVid()">
-            <i class="far fa-thumbs-down"></i> <%= videoData.dislikes %>
+            <% if (video.dislikes.find(obj => obj.channelId == user?.id)) { %>
+              <i class="fas fa-thumbs-down"></i> <%= video.dislikes.length %>
+            <% } else { %>
+              <i class="far fa-thumbs-down"></i> <%= video.dislikes.length %>
+            <% } %>
           </a>
         <div class="progress" style="width:125px;float:right;height:2px;">
-          <div class="progress-bar" role="progressbar" style="width: <%= videoData.likes / (videoData.likes + videoData.dislikes)*100 %>%" aria-valuenow="<%= videoData.likes / (videoData.likes + videoData.dislikes)*100  %>" aria-valuemin="0" aria-valuemax="100"></div>
+          <div class="progress-bar" role="progressbar" style="width: <%= video.likes.length / (video.likes.length + video.dislikes.length)*100 %>%" aria-valuenow="<%= video.likes.length / (video.likes.length + video.dislikes.length)*100  %>" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
         </span>
       </p>
@@ -95,9 +99,9 @@
       <hr>
       <div class="Owner-Section">
         <div class="media">
-          <img class="mr-3 rounded-circle" width="48" src="/avatar/<%= owner.name%>" alt="Generic placeholder image">
+          <img class="mr-3 rounded-circle" width="48" src="/api/avatar/<%= video.owner.id%>" alt="Generic placeholder image">
           <div class="media-body">
-            <h5 class="mt-0"><%= owner.name %></h5>
+            <h5 class="mt-0"><%= video.owner.name %></h5>
               <div class="show-hide-text wrapper">
                 <a id="show-more" class="show-less" href="#show-less">Show less</a>
                 <a id="show-less" class="show-more" href="#show-more">Show more</a>
@@ -109,14 +113,14 @@
         </div>
       </div>
       <div class="comments">
-        <h6><%= videoData.comments%> comments</h6>
+        <h6><%= comments.length %> comments</h6>
         <form class="form-inline" action="/video/comment/<%= video.id%>" method="POST">
           <input type="text" class="form-control" id="inputPassword2" placeholder="Add a public comment" name="content">
           <button type="submit" class="btn btn-primary mb-2">Comment</button>
         </form>
         <% for (const comment of comments) { %>
           <div class="media">
-            <img class="mr-3" src="/avatar/<%= comment.owner.name%>" alt="Icon">
+            <img class="mr-3" src="/api/avatar/<%= comment.ownerId%>" alt="Icon">
             <div class="media-body">
               <h5 class="mt-0"><%= comment.owner.name%></h5>
               <%= comment.content%>
