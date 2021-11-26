@@ -122,7 +122,7 @@
           <div class="media">
             <img class="mr-3" src="/api/avatar/<%= comment.ownerId%>" alt="Icon">
             <div class="media-body">
-              <h5 class="mt-0"><%= comment.owner.name%></h5>
+              <h5 class="mt-0"><%= comment.owner.name%> <small><%= timeAgo.format(comment.createdAt) %><% if (comment.createdAt - comment.updatedAt > 1000) { %> (edited)<% } %></small></h5>
               <%= comment.content%>
             </div>
           </div>
