@@ -11,8 +11,12 @@ const express = require('express'),
 	mStore = MemoryStore(session),
 	bodyParser = require('body-parser'),
 	flash = require('connect-flash'),
-	compression = require('compression');
+	compression = require('compression'),
+	node_media_server = require('../RTMP');
 require('./utils/passport')(passport);
+
+// Run the RTMP server (for livestreaming)
+node_media_server.run();
 
 // normal configuration
 app
@@ -42,6 +46,7 @@ app
 	.use('/user', require('./routes/user'))
 	.use('/api', require('./routes/api'))
 	.use('/channel', require('./routes/channel'))
+	.use('/feed', require('./routes/feed'))
 	.use(function(error, req, res, next) {
 		logger.log(error.message, 'error');
 		res.status(500);

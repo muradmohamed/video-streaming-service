@@ -8,6 +8,28 @@ const client = new PrismaClient({ errorFormat: 'pretty',
 		{ level: 'error', emit: 'event' },
 	] });
 
+client.$use(async (params, next) => {
+	const startTime = Date.now();
+	const result = await next(params);
+	const timeTook = Date.now() - startTime;
+
+	console.log(`Query ${params.model}.${params.action} took ${timeTook}ms`);
+
+	return result;
+});
+
+client.$on('info', (data) => {
+	console.log(data.message);
+});
+
+client.$on('warn', (data) => {
+	console.log(data.message);
+});
+
+client.$on('error', (data) => {
+	console.log(data.message);
+});
+
 module.exports.createChannel = (data) => {
 	return client.channel.create({
 		data: {
@@ -23,9 +45,22 @@ module.exports.findChannel = (data) => {
 		return client.channel.findUnique({ where: { email: data.email } });
 	} else if (data.id) {
 		return client.channel.findUnique({ where: { id: data.id } });
+	} else if (data.stream_key) {
+		return client.channel.findUnique({ where: { streamKey: data.stream_key } });
 	} else {
 		return null;
 	}
+};
+
+module.exports.fetchChannelHistory = (data) => {
+	return client.channel.findUnique({
+		where: {
+			id: data.id,
+		},
+		include: {
+			history: true,
+		},
+	});
 };
 
 module.exports.createVideo = (data) => {
@@ -44,12 +79,23 @@ module.exports.createVideo = (data) => {
 	});
 };
 
-
 module.exports.viewVideo = (data) => {
 	return client.videoView.create({
 		data: {
 			videoId: data.videoId,
 			channelId: data.channelId ?? undefined,
+		},
+	});
+};
+
+module.exports.updateVideo = (data) => {
+	return client.video.update({
+		where: {
+			id: data.id,
+		},
+		data: {
+			title: data.title,
+			description: data.description,
 		},
 	});
 };
@@ -103,6 +149,15 @@ module.exports.likeVideo = (data) => {
 		},
 	});
 };
+
+module.exports.checkSubscription = (data) => {
+	return client.channel.findUnique({
+		where: {
+			id: data.channelId,
+		},
+	}).subscribers();
+};
+
 
 module.exports.dislikeVideo = (data) => {
 	return client.videoRating.upsert({
@@ -197,7 +252,7 @@ module.exports.replyToComment = async (data) => {
 			},
 			video: {
 				connect: {
-					id: comment.videoId,
+					id: data.videoId,
 				},
 			},
 			owner: {
@@ -205,7 +260,6 @@ module.exports.replyToComment = async (data) => {
 					id: data.channelId,
 				},
 			},
-			videoId: data.videoID,
 		},
 	});
 };

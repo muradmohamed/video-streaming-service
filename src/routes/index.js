@@ -32,6 +32,13 @@ router.get('/login', (req, res) => {
 	res.render('navbar/login');
 });
 
+router.get('/livestream/:channelId', (req, res) => {
+	const liveURL = `http://127.0.0.1:8888/live/${req.params.channelId}/index.m3u8`;
+	res.render('live', {
+		user: req.isAuthenticated() ? req.user : null,
+		liveURL,
+	});
+});
 // Upload page
 router.get('/upload', ensureAuthenticated, (req, res) => {
 	res.render('navbar/upload', {

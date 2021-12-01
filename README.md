@@ -52,11 +52,12 @@ Things to do for this to be near complete:
   - [ ] Get notifications to "subscribed" channels
   - [ ] Allow users to make their own playlists
 - [ ] /video?v=videoID
-  - [ ] Allow users to "like", "dislike" - show percentage bar
-  - [ ] Allow users to comment
+  - [x] Allow users to "like", "dislike" - show percentage bar
+  - [x] Allow users to comment
   - [ ] Allow users to "subscribe" to the channel
   - [ ] Set-up advertisement system
-- [ ] Allow live-streaming
+- [x] Allow live-streaming
+  - [ ] socket.io / webRTC for real-time messaging
   - [ ] Donation system
 
 ## 📜 Credits

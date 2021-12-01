@@ -13,6 +13,7 @@ model Channel {
   name     String @unique
   email    String @unique
   password String
+  streamKey String @unique @default(cuid()) @map("stream_key")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

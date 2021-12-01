@@ -2,6 +2,7 @@ node_modules
 # Keep environment variables out of version control
 .env
 config.js
+!RTMP/config.js
 /prisma/migrations
 /src/utils/logs/*
 !/src/utils/logs/example.log

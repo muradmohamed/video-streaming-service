@@ -102,6 +102,12 @@
           <img class="mr-3 rounded-circle" width="48" src="/api/avatar/<%= video.owner.id%>" alt="Generic placeholder image">
           <div class="media-body">
             <h5 class="mt-0"><%= video.owner.name %></h5>
+            <!--Check subscription button-->
+            <% if (video.owner.id !== user?.id) { %>
+              <button style="float:right;" class="btn btn-danger" onclick="Subscribe">Subscribe</button>
+            <% } else if (true) { %>
+              <button style="float:right;" class="btn btn-secondary" onclick="Subscribe">Subscribed</button>
+            <% } %>
               <div class="show-hide-text wrapper">
                 <a id="show-more" class="show-less" href="#show-less">Show less</a>
                 <a id="show-less" class="show-more" href="#show-more">Show more</a>
@@ -119,13 +125,7 @@
           <button type="submit" class="btn btn-primary mb-2">Comment</button>
         </form>
         <% for (const comment of comments) { %>
-          <div class="media">
-            <img class="mr-3" src="/api/avatar/<%= comment.ownerId%>" alt="Icon">
-            <div class="media-body">
-              <h5 class="mt-0"><%= comment.owner.name%> <small><%= timeAgo.format(comment.createdAt) %><% if (comment.createdAt - comment.updatedAt > 1000) { %> (edited)<% } %></small></h5>
-              <%= comment.content%>
-            </div>
-          </div>
+          <%- include('./partials/comment', {comment}) %>
         <% } %>
       </div>
     </div>
@@ -181,6 +181,44 @@
 </body>
 </html>
 <script type="text/javascript">
+  function myFunction() {
+    var x = document.getElementById("replies");
+    console.log(x.dataset)
+    if (x.style.display === "none") {
+      //Show replies
+      $.ajax({
+        type: "GET",
+        url: `/video/replies/${x.dataset.reply}`,
+        dataType: "json",
+        success: function(response) {
+          console.log(response)
+          const comments = []
+          for (const comment of Object.values(response)) {
+            console.log(comment)
+            comments.push(`
+            <div class="media">
+              <img class="mr-3" src="/api/avatar/${comment.ownerId}" alt="Icon">
+              <div class="media-body">
+                <h5 class="mt-0">${comment.owner.name} <small>${(comment.createdAt - comment.updatedAt > 1000)  ? '(edited)' : ''}</small></h5>
+                ${comment.content}
+                <br>
+                <i class="fas fa-thumbs-up"></i> ${comment.likes}
+                <i class="fas fa-thumbs-down"></i> ${comment.dislikes}
+              </div>
+              </div>
+            </div>
+            `)
+          }
+          $('#replies').html(comments.join(' '));
+          // alert(response);
+          x.style.display = "block";
+        }
+      })
+    } else {
+      x.style.display = "none";
+    }
+  }
+
   function likeVid() {
     $.ajax({
   		url: `video/like/${window.location.search.replace('?v=', '')}`,

@@ -104,4 +104,22 @@ router.post('/upload', async (req, res) => {
 	form.parse(req);
 });
 
+// // NOTE: Should add 'caching' so thumbnail only updates every x minutes
+router.get('/lives/thumbnail/:streamKey', (req, res) => {
+	const stream_key = req.params.streamKey;
+	const args = [
+		'-y',
+		'-i', 'http://127.0.0.1:8888/live/' + stream_key + '/index.m3u8',
+		'-ss', '00:00:01',
+		'-vframes', '1',
+		'-vf', 'scale=-2:300',
+		`${process.cwd()}/server/thumbnails/${stream_key}.png`,
+	];
+
+	// Create thumbnail and send back to user
+	const proc = spawn('ffmpeg', args);
+	proc.on('close', function() {
+		res.sendFile(`${process.cwd()}/server/thumbnails/${stream_key}.png`);
+	});
+});
 module.exports = router;
