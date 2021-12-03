@@ -1,0 +1,30 @@
+<% if (isRecommended) { %>
+  <a href="/video?v=vRcil53yYx7CNdDu">
+    <div class="media" style="max-width:400px">
+      <img class="mr-3" src="https://i.ytimg.com/vi/jp6WSDhS0fM/hqdefault.jpg?sqp=-oaymwEbCKgBEF5IVfKriqkDDggBFQAAiEIYAXABwAEG&rs=AOn4CLCXe6UQU3MnZzKhfEwu9ULPcHLGOQ" alt="Generic placeholder image" width="168" height="94">
+      <div class="media-body">
+        <h6 class="mt-0 text-break">New Lethal Tempo - 1.5 second Q cooldown Lvl 1 with Yone</h6>
+        Hunefer<br>
+        505k views - 8 days ago
+      </div>
+    </div>
+  </a>
+<% } else { %>
+  <div class="card" style="width: 330px;border:none;cursor: pointer;"  onclick="location.href='/video?v=<%= video.id %>'">
+    <img class="card-img-top" src="/api/thumbnail?p=<%= video.id%>" alt="Card image cap" style="width:285px">
+    <div class="card-body">
+      <div class="media">
+        <a href="/channel/<%= video.ownerId%>">
+          <img class="mr-3 rounded-circle" width="36" src="/api/avatar/<%= video.ownerId%>" style="border: 1px solid black;">
+        </a>
+        <div class="media-body">
+          <h6 class="mt-0 text-truncate" style="max-width:175px"><%= video.title%></h6>
+          <a href="/channel/<%= video.ownerId%>" data-toggle="tooltip" data-placement="top" title="<%= video.owner.name%>">
+            <small class="ownerName"><%= video.owner.name%><br></small>
+          </a>
+          <small><%= video._count.views%> views - <%=  time(video.uploadedAt)%></small>
+        </div>
+      </div>
+    </div>
+  </div>
+<% } %>

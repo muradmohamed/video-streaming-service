@@ -36,8 +36,8 @@ model Video {
   type       VideoType
   attributes String
 
-  title       String
-  description String?
+  title       String  @db.VarChar(100)
+  description String? @db.VarChar(1000)
 
   views    VideoView[]
   ratings  VideoRating[]

@@ -22,6 +22,7 @@ router.get('/:channelID', async (req, res) => {
 	// Get channel that the user is looking at
 	const channel = await findChannel({ id: req.params.channelID });
 	const videos = await getVideosForChannel(req.params.channelID, 10);
+
 	if (channel) {
 		res.render('channel', {
 			user: req.isAuthenticated() ? req.user : null,

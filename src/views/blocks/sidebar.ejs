@@ -1,88 +1,61 @@
-<nav id="sidebar">
+<nav id="sidebar" style="position: fixed;">
   <ul class="list-unstyled components" style="align:center">
-    <li>
-      <a href="/">Home</a>
+    <li class="small-txt">
+      <a href="/" class="<% if (page == "/") {%> active <%}%>"><i class="fas fa-home"></i> Home</a>
     </li>
-    <li>
-      <a href="/feed/explore">Explore</a>
+    <li class="small-txt">
+      <a href="/feed/explore" class="small-txt <% if (page == "explore") {%> active <%}%>"><i class="far fa-compass"></i> Explore</a>
     </li>
-    <li>
-      <a href="/feed/subscriptions">Subscriptions</a>
+    <li class="small-txt">
+      <a href="/feed/subscriptions" <% if (page == "subscriptions") {%> class="active" <%}%>><i class="fas fa-home"></i> Subscriptions</a>
     </li>
-    <hr>
-    <li>
-      <a href="/feed/subscriptions">library</a>
-    </li>
-    <li>
-      <a href="/feed/subscriptions">History</a>
-    </li>
-    <li>
-      <a href="/feed/subscriptions">Watch later</a>
-    </li>
-    <li>
-      <a href="/feed/subscriptions">Liked videos</a>
+    <li class="small-txt">
+      <a href="/feed/livestreams" <% if (page == "livestreams") {%> class="active" <%}%>><i class="fas fa-home"></i> Livestreams</a>
     </li>
     <hr>
-    <li>
+    <li class="side-text">
+      <a href="/feed/subscriptions" <% if (page == "history") {%> class="active" <%}%>><i class="fas fa-history"></i> History</a>
+    </li>
+    <% if (user) { %>
+      <li class="side-text">
+        <a href="/feed/subscriptions" <% if (page == "later") {%> class="active" <%}%>><i class="fas fa-home"></i> Watch later</a>
+      </li>
+      <li class="side-text">
+        <a href="/feed/subscriptions" <% if (page == "liked") {%> class="active" <%}%>><i class="far fa-thumbs-up"></i> Liked videos</a>
+      </li>
+      <li class="side-text">
+        <a class="btn" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+          Show more
+        </a>
+        <div class="collapse" id="collapseExample">
+          <ul class="list-unstyled components" style="align:center">
+            <li>Test</li>
+          </ul>
+        </div>
+      </li>
+      <hr>
       <h4>Subscription</h4>
-      ...
-    </li>
-    <hr>
+      <hr>
+    <% } else { %>
+      <p class="side-text">Sign in to like videos, comment, and subscribe.</p>
+      <a class="nav-item btn btn-outline-primary side-text" href="/login" style="font-color: blue">
+        <i class="far fa-user"></i> Sign in
+      </a>
+    <% } %>
     <li>
-      <h4>Settings</h4>
-    </li>
-    <li>
-      <h4>Report history</h4>
-    </li>
-    <li>
-      <h4>Help</h4>
+      <a href="/"><i class="fas fa-cog"></i> Settings</a>
     </li>
     <li>
-      <h4>Send feedback</h4>
+      <a href="/">Report history</a>
     </li>
     <li>
-      <h4>Send feedback</h4>
+      <a href="/">Help</a>
     </li>
-    <li>
-      <h4>Send feedback</h4>
-    </li>
-    <li>
-      <h4>Send feedback</h4>
-    </li>
-    <li>
-      <h4>Send feedback</h4>
-    </li>
-    <li>
-      <h4>Send feedback</h4>
-    </li>
-    <li>
-      <h4>Send feedback</h4>
-    </li>
-    <li>
-      <h4>Send feedback</h4>
-    </li>
-    <li>
-      <h4>Send feedback</h4>
-    </li>
-    
   </ul>
+  <div class="legal side-text">
+    <a href="/">About</a>
+  </div>
 </nav>
-<style>
-  a:hover {
-    text-decoration: none;
-  }
-  .card-text:hover {
-    background-color: none;
-  }
-  .smallFav {
-    display: none;
-  }
-  @media (max-width: 1260px) {
-    .smallFav {
-      display: block
-    }
-  }
-</style>
 <script type="text/javascript">
   //icon update
   $('[data-toggle="collapse"]').on('click', function(){

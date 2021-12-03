@@ -1,14 +1,37 @@
-<script src="https://cdn.bootcss.com/flv.js/1.5.0/flv.min.js"></script>
-<video id="videoElement" width="700"></video>
-<script>
-  if (flvjs.isSupported()) {
-    var videoElement = document.getElementById('videoElement');
-    var flvPlayer = flvjs.createPlayer({
-      type: 'flv',
-      url: 'http://127.0.0.1:8888/live/ben.flv'
-    });
-    flvPlayer.attachMediaElement(videoElement);
-    flvPlayer.load();
-    flvPlayer.play();
-  }
-</script>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>{{}} is live</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/popper.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/theme.js"></script>
+    <script src="https://cdn.bootcss.com/flv.js/1.5.0/flv.min.js"></script>
+    <link rel="stylesheet" href="/css/video-player.css" type="text/css">
+  </head>
+  <body>
+    <%- include('./blocks/navbar', {user}) %>
+    <div class="container-fluid" style="padding-top:25px;">
+      <div class="row">
+        <div class="col-lg-8">
+          <%- include('./partials/video-player', { live: true})%>
+        <video id="videoElement" width="700"></video>
+      </div>
+    </div>
+    <script>
+      if (flvjs.isSupported()) {
+        var videoElement = document.getElementById('video');
+        var flvPlayer = flvjs.createPlayer({
+          type: 'flv',
+          url: 'http://127.0.0.1:8888/live/ben.flv'
+        });
+        flvPlayer.attachMediaElement(videoElement);
+        flvPlayer.load();
+        flvPlayer.play();
+      }
+    </script>
+  </body>
+</html>

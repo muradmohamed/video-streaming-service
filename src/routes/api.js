@@ -1,8 +1,8 @@
 const express = require('express'),
 	fs = require('fs'),
 	{ IncomingForm } = require('formidable'),
-	{ GenVideoID } = require('../utils'),
-	{ createVideo, findChannel } = require('../utils/database'),
+	{ GenVideoID, ensureAuthenticated } = require('../utils'),
+	{ createVideo, findChannel, updateVideo } = require('../utils/database'),
 	{ spawn } = require('child_process'),
 	router = express.Router();
 
@@ -34,7 +34,7 @@ router.get('/avatar/:channelID', async (req, res) => {
 });
 
 // Upload video
-router.post('/upload', async (req, res) => {
+router.post('/upload', ensureAuthenticated, async (req, res) => {
 	const form = new IncomingForm({
 		multiples: false,
 		allowEmptyFiles: false,
@@ -55,6 +55,11 @@ router.post('/upload', async (req, res) => {
 
 		try {
 			const videoID = GenVideoID();
+			res.json({
+				id: videoID,
+				title: file.originalFilename,
+			});
+
 			await createVideo({
 				id: videoID,
 				title: file.originalFilename,
@@ -104,22 +109,48 @@ router.post('/upload', async (req, res) => {
 	form.parse(req);
 });
 
+router.post('/upload/update/:videoID', ensureAuthenticated, async (req, res) => {
+	const { title, description } = req.body;
+	console.log(req.body);
+	return;
+	try {
+		await updateVideo({
+			id: req.params.videoID,
+			title, description,
+		});
+		res.json({ success: 'complete' });
+	} catch (e) {
+		console.log(e);
+		res.json({ error: e.message });
+	}
+});
+
 // // NOTE: Should add 'caching' so thumbnail only updates every x minutes
 router.get('/lives/thumbnail/:streamKey', (req, res) => {
-	const stream_key = req.params.streamKey;
-	const args = [
-		'-y',
-		'-i', 'http://127.0.0.1:8888/live/' + stream_key + '/index.m3u8',
-		'-ss', '00:00:01',
-		'-vframes', '1',
-		'-vf', 'scale=-2:300',
-		`${process.cwd()}/server/thumbnails/${stream_key}.png`,
-	];
-
-	// Create thumbnail and send back to user
-	const proc = spawn('ffmpeg', args);
-	proc.on('close', function() {
+	const stream_key = req.params.streamKey,
+		path = `${process.cwd()}/server/thumbnails/${stream_key}.png`;
+	// Only generate a thumbnail if a thumbnail doesn't exist or was created within the last 5 minutes
+	if (!(fs.existsSync(path) && (new Date() - fs.statSync(path).birthtime) <= 5 * 60 * 1000)) {
 		res.sendFile(`${process.cwd()}/server/thumbnails/${stream_key}.png`);
-	});
+	} else {
+		console.log('generating new thumbnail');
+		const args = [
+			'-y',
+			'-i', 'http://127.0.0.1:8888/live/' + stream_key + '/index.m3u8',
+			'-ss', '00:00:01',
+			'-vframes', '1',
+			'-vf', 'scale=-2:300',
+			`${process.cwd()}/server/thumbnails/${stream_key}.png`,
+		];
+
+		// Create thumbnail and send back to user
+		const proc = spawn('ffmpeg', args);
+
+		proc.on('close', function() {
+			res.sendFile(`${process.cwd()}/server/thumbnails/${stream_key}.png`);
+		});
+	}
 });
+
+
 module.exports = router;

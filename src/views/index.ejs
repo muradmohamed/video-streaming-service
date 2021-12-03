@@ -1,106 +1,13 @@
 <%- include('./blocks/navbar', {user}) %>
 <div class="wrapper">
-  <%- include('./blocks/sidebar.ejs') %>
-  <div class="container-fluid">
-    <div class="d-flex justify-content-center flex-wrap" style="max-width:92%">
+  <%- include('./blocks/sidebar.ejs', {page: "/"}) %>
+  <div class="container-fluid" style="padding-left:245px;">
+    <div class="d-flex justify-content-center flex-wrap">
       <% for (let count = 0; count < 20; count++) { %>
       <div style="padding:10px;">
-        <a href="/video?v=<%= videos[0].id%>">
-          <div class="card" style="width: 18rem;border:none;">
-            <img class="card-img-top" src="/api/thumbnail?p=<%= videos[0].id%>" alt="Card image cap">
-            <div class="card-body">
-              <div class="media">
-                <a href="/channel/<%= videos[0].ownerId%>">
-                  <img class="mr-3 rounded-circle" width="36" src="/api/avatar/<%= videos[0].ownerId%>" style="border: 1px solid black;">
-                </a>
-                <div class="media-body">
-                  <h6 class="mt-0 text-truncate" style="max-width:175px"><%= videos[0].title%></h6>
-                  <a href="/channel/<%= videos[0].ownerId%>" data-toggle="tooltip" data-placement="top" title="<%= videos[0].owner.name%>">
-                    <small><%= videos[0].owner.name%><br></small>
-                  </a>
-                  <small><%= videos[0]._count.views%> views - <%=  timeAgo.format(videos[0].uploadedAt)%></small>
-                </div>
-              </div>
-            </div>
-          </div>
-        </a>
+        <%- include('./partials/video-thumbnail.ejs', {video: videos[0], time, isRecommended: false})%>
       </div>
       <% } %>
     </div>
   </div>
 </div>
-<style>
-  .wrapper {
-    display: flex;
-    width: 100%;
-    align-items: stretch;
-  }
-  #sidebar {
-    width: 250px;
-    height: 100vh;
-    background: #343a40;
-    transition: all 0.3s;
-    overflow-y:scroll;
-  }
-  #sidebar .sidebar-header {
-    color: black;
-    padding: 20px;
-  }
-  #sidebar ul.components {
-    padding: 20px 0;
-    border-bottom: 1px solid #47748b;
-  }
-  #sidebar ul p {
-  color: #fff;
-  padding: 10px;
-  }
-  #sidebar ul li a {
-  padding: 10px;
-  font-size: 1.1em;
-  display: block;
-  color: black;
-  }
-  #sidebar ul li a:not(.active):hover {
-  color: black;
-  background: #53A5D2;
-  border-radius: 8px;
-  }
-  .active {
-  background: #157cb4;
-  border-radius: 8px;
-  }
-  /* ---------------------------------------------------
-  CONTENT STYLE
-  -----------------------------------------------------
-  */
-  #content {
-  width: 100%;
-  min-height: 100vh;
-  transition: all 0.3s;
-  }
-  /* ---------------------------------------------------
-  MEDIAQUERIES
-  ----------------------------------------------------- */
-  @media (max-width: 1260px) {
-  #sidebar {
-  width: 70px;
-  }
-  .side-text {
-  display: none
-  }
-  .fas {
-  padding-left: 15px;
-  }
-  #sidebar.active {
-  margin-left: 0;
-  }
-  #sidebarCollapse span {
-  display: none;
-  }
-  }
-  @media (max-width: 710px) {
-  .searchBar {
-  display: none;
-  }
-  }
-</style>

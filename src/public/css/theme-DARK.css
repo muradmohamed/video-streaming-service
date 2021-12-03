@@ -1,0 +1,64 @@
+body {
+  background-color: #181818
+}
+
+.navbar {
+  background-color: #202020
+}
+.btn {
+  color: white
+}
+.btn:hover {
+  color: grey
+}
+.navbar-toggler-icon {
+  background-color: white;
+  color:red
+}
+a, .light {
+  color: white
+}
+a:hover {
+  color: grey
+}
+small, p {
+  color: grey
+}
+hr {
+  background-color: #303030;
+}
+.ownerName:hover {
+  color: white
+}
+#sidebar {
+  background-color: #202020;
+}
+#sidebar ul li a {
+  color: white
+}
+#sidebar ul p {
+	color: white
+}
+#sidebar ul li:hover {
+	background-color: #383838;
+}
+#sidebar ul li .active:hover {
+	background-color: #4c4c4c;
+}
+.active {
+	background: #383838;
+	border-radius: 2px;
+}
+h1, h2, h3, h4, h5, h6 {
+  color: white
+}
+#myInput {
+  background-color: #121212;
+  border: none;
+  width: 300px
+}
+#searchIconBtn {
+  background-color: #121212;
+  border: none;
+  border-radius:0px 3px 3px 0px;
+}

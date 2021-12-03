@@ -1,9 +1,27 @@
 <%- include('../blocks/navbar', {user}) %>
 <div class="wrapper">
-  <%- include('../blocks/sidebar.ejs') %>
-  <div class="container-fluid">
-    <a href="#">
-      <img src="http://localhost:2500/api/lives/thumbnail/ben" alt="">
-    </a>
+  <%- include('../blocks/sidebar.ejs', {page: "livestreams"}) %>
+  <div class="container-fluid" style="padding-left:245px;">
+    <div class="d-flex justify-content-center flex-wrap">
+      <% for (const live of Object.keys(lives)) { %>
+        <div class="card" style="width: 330px;border:none;cursor: pointer;"  onclick="location.href='/livestream/<%= live%>'">
+          <img class="card-img-top" src="http://localhost:2500/api/lives/thumbnail/<%= live%>" alt="Card image cap" style="width:285px">
+          <div class="card-body">
+            <div class="media">
+              <a href="/channel/<%= users.find(user => user.streamKey == live).id%>">
+                <img class="mr-3 rounded-circle" width="36" src="/api/avatar/<%= users.find(user => user.streamKey == live).id %>" style="border: 1px solid black;">
+              </a>
+              <div class="media-body">
+                <h6 class="mt-0 text-truncate" style="max-width:175px">{{TITLE}}</h6>
+                <a href="/channel/<%=  users.find(user => user.streamKey == live).id %>" data-toggle="tooltip" data-placement="top" title="<%= users.find(user => user.streamKey == live).name %>">
+                  <small class="ownerName"><%= users.find(user => user.streamKey == live).name %><br></small>
+                </a>
+                <small><%= lives[live].subscribers.length ?? 0 %> viewers</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
   </div>
 </div>

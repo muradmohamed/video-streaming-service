@@ -17,27 +17,6 @@ module.exports.ensureAuthenticated = (req, res, next) => {
 		.redirect('/login');
 };
 
-module.exports.checkDev = (req, res, next) => {
-	if (req.isAuthenticated()) {
-		/*
-		if (company.devs.includes(req.user._id.toString())) {
-			return next();
-		} else {
-			res.status(403)
-				.render('403-page.ejs', {
-					user: req.isAuthenticated() ? req.user : null,
-					company,
-				});
-		}
-		*/
-		next();
-	} else {
-		return res
-			.status(302)
-			.redirect('/login');
-	}
-};
-
 module.exports.partition = (array, predicate) => {
 	const partitionOne = [];
 	const partitionTwo = [];
@@ -52,6 +31,22 @@ module.exports.partition = (array, predicate) => {
 
 	return [partitionOne, partitionTwo];
 };
+const en = require('javascript-time-ago/locale/en.json'),
+	TimeAgo = require('javascript-time-ago');
+// Configure time format to use en-US
+TimeAgo.addDefaultLocale(en);
+const timeAgo = new TimeAgo('en-US');
+
+module.exports.time = (date) => {
+	// if video was upload morethan 2 weeks ago use different format
+	if (new Date() - date >= 2 * 604800000) {
+		const months = ['Jan', 'Feb', 'March', 'April', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+		return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+	} else {
+		return timeAgo.format(date);
+	}
+};
+
 
 module.exports.commentMapper = (comment) => {
 	const [likes, dislikes] = this.partition(comment.ratings, (c) => c.type === 'LIKE');

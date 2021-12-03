@@ -1,7 +1,7 @@
 const express = require('express'),
 	router = express.Router(),
 	{ ensureAuthenticated } = require('../utils'),
-	{ getVideo, likeVideo, dislikeVideo, viewVideo, createComment, fetchComments } = require('../utils/database'),
+	{ getVideo, likeVideo, dislikeVideo, viewVideo, createComment, fetchComments, replyToComment, fetchCommentReplies, checkSubscription } = require('../utils/database'),
 	TimeAgo = require('javascript-time-ago'),
 	fs = require('fs');
 
@@ -12,12 +12,13 @@ router.get('/', async (req, res) => {
 		// Fetch all data from database
 		const video = await getVideo({ id: req.query.v }),
 			comments = await fetchComments({ videoID: req.query.v });
-
+			// subsribed = await checkSubscription(req.user?.id) ?? false;
+		console.log(comments);
 		// Display page
 		res.render('video', {
 			user: req.isAuthenticated() ? req.user : null,
 			ID: req.query.v,
-			video, comments,
+			video, comments, // subsribed,
 			timeAgo,
 		});
 	} else {
@@ -83,6 +84,36 @@ router.post('/comment/:videoID', ensureAuthenticated, async (req, res) => {
 		res.json({ error: 'error' });
 	}
 });
+
+router.post('/reply/:videoID/:parentID', ensureAuthenticated, async (req, res) => {
+	const { content } = req.body;
+	try {
+		await replyToComment({
+			content: content,
+			commentId: Number(req.params.parentID),
+			channelId: req.user.id,
+			videoId: req.params.videoID,
+			comment: {
+				id: Number(req.params.parentID),
+			},
+		});
+		res.json({ success: 'Success' });
+	} catch (e) {
+		console.log(e);
+		res.json({ success: e.message });
+	}
+});
+
+router.get('/replies/:parentID', async (req, res) => {
+	try {
+		const comments = await fetchCommentReplies(Number(req.params.parentID));
+		res.json({ ...comments });
+	} catch (e) {
+		console.log(e);
+		res.json({});
+	}
+});
+
 // streaming route
 router.get('/data/:id', (req, res) => {
 	const videoPath = process.cwd() + `/src/uploads/videos/${req.params.id}.webm`,

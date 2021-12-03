@@ -11,9 +11,7 @@ nms.on('prePublish', async (id, StreamPath, args) => {
 
 	// Only accept logged in
 	const channel = await findChannel({ stream_key: stream_key });
-	if (channel) {
-		// code
-	} else {
+	if (!channel) {
 		const session = nms.getSession(id);
 		session.reject();
 	}
