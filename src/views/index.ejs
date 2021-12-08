@@ -4,9 +4,13 @@
   <div class="container-fluid" style="padding-left:245px;">
     <div class="d-flex justify-content-center flex-wrap">
       <% for (let count = 0; count < 20; count++) { %>
-      <div style="padding:10px;">
-        <%- include('./partials/video-thumbnail.ejs', {video: videos[0], time, isRecommended: false})%>
-      </div>
+        <% if (!videos[0]) {%>
+          <p>No videos have been uploaded yet</p>
+        <% } else { %>
+          <div style="padding:10px;">
+            <%- include('./partials/video-thumbnail.ejs', {video: videos[0], time, isRecommended: false})%>
+          </div>
+        <% }%>
       <% } %>
     </div>
   </div>
